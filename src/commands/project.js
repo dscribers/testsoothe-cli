@@ -55,7 +55,7 @@ const fetch = async (override = false, id) => {
 
   if (!override) {
     if (id) {
-      const single = data.find((project) => project.id === id)
+      const single = data.find((project) => `${project.id}` === `${id}`)
 
       if (single) {
         return single
