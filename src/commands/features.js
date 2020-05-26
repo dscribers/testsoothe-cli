@@ -57,8 +57,10 @@ const getQuestions = (features, current) => {
   ]
 }
 
-const successMessage = (feature, log) =>
+const successMessage = (feature, log) => {
+  config.delete('scenarios')
   log(`Current feature: <id: ${feature.id}> ${feature.title}`)
+}
 
 module.exports = (program, { error, success }) => {
   program

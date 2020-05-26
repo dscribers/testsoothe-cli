@@ -1,6 +1,7 @@
 const path = require('path')
 const command = path.basename(__filename, '.js')
 const template = require('./template')
+const config = require('../lib/config')
 
 const createUrl = (id) => {
   let url = '/projects'
@@ -37,8 +38,12 @@ const getQuestions = (projects, current) => {
   ]
 }
 
-const successMessage = (project, log) =>
+const successMessage = (project, log) => {
+  config.delete('features')
+  config.delete('scenarios')
+  config.delete('flows')
   log(`Current project: <id: ${project.id}> ${project.name}`)
+}
 
 module.exports = (program, { error, success }) => {
   program
