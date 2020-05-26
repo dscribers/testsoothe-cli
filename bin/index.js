@@ -16,7 +16,7 @@ program.version(version)
 // console.log(
 //   colors.rainbow(figlet.textSync('TestSuite', { horizontalLayout: 'full' }))
 // )
-const programs = ['auth', 'project']
+const commands = require('../src/commands')
 
 const error = (message) => {
   console.log(colors.red(message))
@@ -26,7 +26,7 @@ const success = (message) => {
   console.log(colors.green(message))
 }
 
-programs.forEach((prog) => {
+commands.forEach((prog) => {
   require(`../src/commands/${prog}`)(program, { success, error })
 })
 

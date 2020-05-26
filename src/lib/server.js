@@ -89,8 +89,9 @@ const login = async (email) => {
 const logout = () => {
   const email = config.get('auth.email')
 
-  config.delete('auth')
-  config.delete('projects')
+  require('../commands').forEach((command) => {
+    config.delete(command)
+  })
 
   return email
 }
