@@ -1,4 +1,4 @@
-const { login, request } = require('../lib/server')
+const { loading, login, http } = require('../lib/server')
 const config = require('../lib/config')
 const inquirer = require('inquirer')
 const clear = require('clear')
@@ -12,11 +12,9 @@ const showList = async (fresh, error) => {
 
     const current = config.get(`${configKey}.current`)
 
-    console.log(current)
-
     const { id } = await inquirer.prompt(settings.getQuestions(items, current))
 
-    await select(id, fresh, error)
+    await select(id, false, error)
   } catch (e) {
     return error(e.message)
   }
@@ -74,12 +72,27 @@ const fetch = async (fresh = false, id) => {
 
 const fetchFromServer = async (id) => {
   if (settings.auth !== false) {
-    login()
+    await login()
+    clear()
   }
 
-  const { data } = await request.get(settings.createUrl(id))
+  let loader
 
-  return data
+  try {
+    let message = `Fetching ${configKey}`
+
+    if (id) {
+      message += `(${id})`
+    }
+
+    loader = loading(message)
+
+    const { data } = await http.get(settings.createUrl(id))
+
+    return data
+  } finally {
+    loader.stop()
+  }
 }
 
 const checkOK = (value, errorMessage) => {

@@ -7,7 +7,7 @@ module.exports = (program, { error, success }) => {
     .description('logs a new user in')
     .action(async (defEmail) => {
       try {
-        const { email } = await login(defEmail)
+        const { email } = await login(false, defEmail)
 
         success(`Logged in (${colors.italic(email)})`)
       } catch (e) {

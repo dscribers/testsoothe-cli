@@ -1,7 +1,9 @@
 const axios = require('axios')
 const config = require('./config')
 
-module.exports = axios.create({
+const Http = require('@ezraobiwale/http/dist/http')
+
+module.exports = new Http({
   baseURL: 'https://testsuiteapi-sprint.apps.dscribe.tech/api',
   transformRequest: [
     (data, headers) => {
@@ -13,6 +15,5 @@ module.exports = axios.create({
     },
     ...axios.defaults.transformRequest,
   ],
-  transformResponse: [...axios.defaults.transformResponse, (data) => data.data],
   withCredentials: true,
 })

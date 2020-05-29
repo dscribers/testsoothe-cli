@@ -1,7 +1,7 @@
 const { Spinner } = require('clui')
 
 const config = require('./config')
-const request = require('./request')
+const http = require('./http')
 const inquirer = require('inquirer')
 
 const getCredentials = (email) => {
@@ -40,50 +40,63 @@ const getCredentials = (email) => {
 
 const getToken = async (email) => {
   const credentials = await getCredentials(email || config.get('auth.email'))
-  const spinner = new Spinner(`Logging ${credentials.email} in`)
+  let loader
 
-  spinner.start()
-  const { data } = await request.post('/auth/login', credentials)
+  try {
+    loader = loading(`Logging ${credentials.email} in`)
+    const { data } = await http.post('/auth/login', credentials)
 
-  if (data.token) {
-    config.set('auth.email', credentials.email)
-    config.set('auth.token', data.token)
+    if (data.token) {
+      config.set('auth.email', credentials.email)
+      config.set('auth.token', data.token)
 
-    spinner.stop()
-    return { email: credentials.email, token: data.token }
-  } else {
-    spinner.stop()
-    throw new Error('TestSuite token was not found in the response')
+      return { email: credentials.email, token: data.token }
+    } else {
+      throw new Error('TestSuite token was not found in the response')
+    }
+  } finally {
+    loader.stop()
   }
 }
 
 const isValidToken = async () => {
-  const spinner = new Spinner('Checking status')
-
   try {
-    const token = config.get('auth.token')
+    const auth = config.get('auth')
 
-    if (!token) {
+    if (!auth.token) {
       return false
     }
 
-    spinner.start()
-    return (await request.get('user/profile')).data
+    return auth
   } catch (e) {
     return false
-  } finally {
-    spinner.stop()
   }
 }
 
-const login = async (email) => {
+const loading = (message, start = true) => {
+  const spinner = new Spinner(message)
+
+  if (start) {
+    spinner.start()
+  }
+
+  return spinner
+}
+
+const login = async (force, email) => {
   if (!email) {
     const profile = await isValidToken()
     email = profile.email
   }
 
-  if (!email) {
-    return await getToken(email)
+  if (force || !email) {
+    let authEmail = email
+
+    if (force) {
+      authEmail = logout()
+    }
+
+    return await getToken(authEmail)
   } else {
     return { email }
   }
@@ -100,7 +113,8 @@ const logout = () => {
 }
 
 module.exports = {
+  http,
+  loading,
   login,
   logout,
-  request,
 }

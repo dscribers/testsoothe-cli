@@ -15,12 +15,7 @@ const createUrl = (id) => {
   return url
 }
 
-const defaultData = [
-  {
-    id: 1,
-    name: 'Test Project 1',
-  },
-]
+const defaultData = []
 
 const getQuestions = (projects, current) => {
   return [
