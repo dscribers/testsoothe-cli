@@ -1,4 +1,3 @@
-const colors = require('colors')
 const { Spinner } = require('clui')
 
 const config = require('./config')
@@ -41,23 +40,26 @@ const getCredentials = (email) => {
 
 const getToken = async (email) => {
   const credentials = await getCredentials(email || config.get('auth.email'))
+  const spinner = new Spinner(`Logging ${credentials.email} in`)
 
-  const { data } = await request.post(
-    'http://backend.test/api/auth/login',
-    credentials
-  )
+  spinner.start()
+  const { data } = await request.post('/auth/login', credentials)
 
   if (data.token) {
     config.set('auth.email', credentials.email)
     config.set('auth.token', data.token)
 
+    spinner.stop()
     return { email: credentials.email, token: data.token }
   } else {
+    spinner.stop()
     throw new Error('TestSuite token was not found in the response')
   }
 }
 
 const isValidToken = async () => {
+  const spinner = new Spinner('Checking status')
+
   try {
     const token = config.get('auth.token')
 
@@ -65,24 +67,25 @@ const isValidToken = async () => {
       return false
     }
 
-    await request.get('user/profile')
-    return true
+    spinner.start()
+    return (await request.get('user/profile')).data
   } catch (e) {
     return false
+  } finally {
+    spinner.stop()
   }
 }
 
 const login = async (email) => {
-  try {
-    // const status = new Spinner('Authenticating you. Please wait ...')
+  if (!email) {
+    const profile = await isValidToken()
+    email = profile.email
+  }
 
-    if (email || !(await isValidToken())) {
-      logout(false)
-
-      await getToken(email)
-    }
-  } finally {
-    // status.stop()
+  if (!email) {
+    return await getToken(email)
+  } else {
+    return { email }
   }
 }
 

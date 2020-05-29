@@ -1,3 +1,4 @@
+const colors = require('colors')
 const { login, logout } = require('../lib/server')
 
 module.exports = (program, { error, success }) => {

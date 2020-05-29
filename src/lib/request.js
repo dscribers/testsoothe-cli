@@ -2,7 +2,7 @@ const axios = require('axios')
 const config = require('./config')
 
 module.exports = axios.create({
-  baseURL: 'http://backend.test/api',
+  baseURL: 'https://testsuiteapi-sprint.apps.dscribe.tech/api',
   transformRequest: [
     (data, headers) => {
       if (config.has('auth.token')) {
