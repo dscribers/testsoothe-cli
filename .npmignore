@@ -1,0 +1,8 @@
+node_modules
+src
+.dockerignore
+.git
+.gitignore
+docker-compose.yml
+Dockerfile
+yarn-error.log

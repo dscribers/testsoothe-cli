@@ -16,56 +16,7 @@ const createUrl = (id) => {
   return url
 }
 
-const defaultData = [
-  {
-    id: 1,
-    feature_id: '1',
-    title: 'Register - Success',
-    lines: [
-      {
-        cmd: 'When',
-        sub_cmd: 'I go to',
-        text: '__registration_url__',
-      },
-      {
-        cmd: 'And',
-        sub_cmd: 'in',
-        text: '__email__',
-        selector: 'inputEmail',
-      },
-      {
-        cmd: 'And',
-        sub_cmd: 'in',
-        text: '__password__',
-        selector: 'inputPassword',
-      },
-      {
-        cmd: 'And',
-        sub_cmd: 'I submit form',
-        selector: 'form',
-      },
-      {
-        cmd: 'And',
-        sub_cmd: 'I wait till page loads',
-      },
-      {
-        cmd: 'Then',
-        sub_cmd: 'I should be on',
-        text: '__login_url__?registered=1',
-      },
-      {
-        cmd: 'And',
-        sub_cmd: 'should contain',
-        text: 'Registration successful',
-      },
-    ],
-    gherkin:
-      'Scenario: Register - Success\n\tWhen I go to "__registration_url__"\n\tAnd I type "__email__" in "inputEmail"\n\tAnd I type "__password__" in "inputPassword"\n\tAnd I submit form "form"\n\tAnd I wait till page loads\n\tThen I should be on "__login_url__?registered=1"\n\tAnd page should contain "Registration successful"',
-    position: '0',
-    parsed_gherkin:
-      'Scenario: Register - Success\n\tWhen I go to "http://localhost/dstest/register.html"\n\tAnd I type "ezra@mail.com" in "inputEmail"\n\tAnd I type "pass" in "inputPassword"\n\tAnd I submit form "form"\n\tAnd I wait till page loads\n\tThen I should be on "http://localhost/dstest/login.html?registered=1"\n\tAnd page should contain "Registration successful"',
-  },
-]
+const defaultData = []
 
 const getQuestions = (scenarios, current) => {
   return [

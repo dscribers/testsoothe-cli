@@ -16,26 +16,7 @@ const createUrl = (id) => {
   return url
 }
 
-const defaultData = [
-  {
-    id: 1,
-    project_id: '1',
-    name: 'et',
-    scenarios: [1, 2],
-  },
-  {
-    id: 2,
-    project_id: '1',
-    name: 'quibusdam',
-    scenarios: [3, 4],
-  },
-  {
-    id: 3,
-    project_id: '1',
-    name: 'recusandae',
-    scenarios: [5, 6],
-  },
-]
+const defaultData = []
 
 const getQuestions = (flows, current) => {
   return [

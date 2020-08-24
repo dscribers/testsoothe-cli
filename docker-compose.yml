@@ -1,7 +1,7 @@
 # for local development
 version: "3.7"
 services:
-  testsuite-cli:
+  cli:
     build:
       context: .
       target: "develop-stage"

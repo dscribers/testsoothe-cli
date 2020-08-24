@@ -16,30 +16,7 @@ const createUrl = (id) => {
   return url
 }
 
-const defaultData = [
-  {
-    id: 1,
-    project_id: '1',
-    title: 'Register',
-    description: [
-      {
-        cmd: 'In order to',
-        text: 'see the dashboard',
-      },
-      {
-        cmd: 'As a',
-        text: 'user',
-      },
-      {
-        cmd: 'I need to',
-        text: 'register',
-      },
-    ],
-    gherkin:
-      'Feature: Register\n\tIn order to see the dashboard\n\tAs a user\n\tI need to register',
-    position: '0',
-  },
-]
+const defaultData = []
 
 const getQuestions = (features, current) => {
   return [

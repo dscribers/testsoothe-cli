@@ -10,6 +10,10 @@ const showList = async (fresh, error) => {
   try {
     const items = await fetch(fresh)
 
+    if (!items.length) {
+      return error(`No ${configKey} found`)
+    }
+
     const current = config.get(`${configKey}.current`)
 
     const { id } = await inquirer.prompt(settings.getQuestions(items, current))
@@ -87,7 +91,8 @@ const fetchFromServer = async (id) => {
 
     loader = loading(message)
 
-    const { data } = await http.get(settings.createUrl(id))
+    const url = settings.createUrl(id)
+    const { data } = await http.get(url)
 
     return data
   } finally {
