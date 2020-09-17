@@ -8,3 +8,10 @@ services:
     volumes:
       - ".:/app"
     tty: true
+    networks:
+      - testsuite_backend
+
+networks:
+  testsuite_backend:
+     external:
+      name: testsuite_backend_external

@@ -35,7 +35,7 @@ const getQuestions = (scenarios, current) => {
 }
 
 const successMessage = (scenario, log) =>
-  log(`Current scenario: <id: ${scenario.id}> ${scenario.title}`)
+  log(scenario.title, `Current scenario`)
 
 module.exports = (program, { error, success }) => {
   program
@@ -51,6 +51,7 @@ module.exports = (program, { error, success }) => {
         createUrl,
         defaultData,
         getQuestions,
+        labelKey: 'title',
         success: (item) => successMessage(item, success),
       })
 

@@ -34,8 +34,7 @@ const getQuestions = (flows, current) => {
   ]
 }
 
-const successMessage = (flow, log) =>
-  log(`Current project flow: <id: ${flow.id}> ${flow.name}`)
+const successMessage = (flow, log) => log(flow.name, `Current project flow`)
 
 module.exports = (program, { error, success }) => {
   program
@@ -51,6 +50,7 @@ module.exports = (program, { error, success }) => {
         createUrl,
         defaultData,
         getQuestions,
+        labelKey: 'name',
         success: (item) => successMessage(item, success),
       })
 

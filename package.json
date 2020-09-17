@@ -15,8 +15,10 @@
     "colors": "^1.4.0",
     "commander": "^5.1.0",
     "configstore": "^5.0.1",
+    "dotenv": "^8.2.0",
     "figlet": "^1.4.0",
     "inquirer": "^7.1.0",
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.15",
+    "open": "^7.2.1"
   }
 }

@@ -44,7 +44,7 @@ const getToken = async (email) => {
 
   try {
     loader = loading(`Logging ${credentials.email} in`)
-    const { data } = await http.post('/auth/login', credentials)
+    const { data } = await http.post('/auth/login?cmd=1', credentials)
 
     if (data.token) {
       config.set('auth.email', credentials.email)
@@ -52,7 +52,9 @@ const getToken = async (email) => {
 
       return { email: credentials.email, token: data.token }
     } else {
-      throw new Error('TestSuite token was not found in the response')
+      throw new Error(
+        process.env.APP_NAME + ' token was not found in the response'
+      )
     }
   } finally {
     loader.stop()
@@ -73,7 +75,7 @@ const isValidToken = async () => {
   }
 }
 
-const loading = (message, start = true) => {
+const loading = (message = '', start = true) => {
   const spinner = new Spinner(message)
 
   if (start) {

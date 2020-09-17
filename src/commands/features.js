@@ -36,7 +36,7 @@ const getQuestions = (features, current) => {
 
 const successMessage = (feature, log) => {
   config.delete('scenarios')
-  log(`Current feature: <id: ${feature.id}> ${feature.title}`)
+  log(feature.title, 'Current feature')
 }
 
 module.exports = (program, { error, success }) => {
@@ -53,6 +53,7 @@ module.exports = (program, { error, success }) => {
         createUrl,
         defaultData,
         getQuestions,
+        labelKey: 'title',
         success: (item) => successMessage(item, success),
       })
 

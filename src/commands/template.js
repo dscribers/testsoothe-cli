@@ -29,8 +29,9 @@ const select = async (id, fresh, error) => {
     const item = await fetch(fresh, id)
 
     config.set(`${configKey}.current`, item.id)
+    config.set(`${configKey}.label`, item[settings.labelKey])
 
-    clear()
+    console.log()
     settings.success(item)
   } catch (e) {
     return error(e.message)
@@ -77,7 +78,7 @@ const fetch = async (fresh = false, id) => {
 const fetchFromServer = async (id) => {
   if (settings.auth !== false) {
     await login()
-    clear()
+    console.log
   }
 
   let loader
@@ -110,15 +111,19 @@ module.exports = (action, config) => {
   checkOK(action, 'Action is required')
   checkOK(
     typeof config.createUrl === 'function',
-    'Function "createUrl" is required'
+    'Config "createUrl" (function) is required'
   )
   checkOK(
     typeof config.getQuestions === 'function',
-    'Function "getQuestions" is required'
+    'Config "getQuestions" (function) is required'
+  )
+  checkOK(
+    typeof config.labelKey === 'string' && !!config.labelKey.trim(),
+    'Config "labelKey" (string) is required'
   )
   checkOK(
     typeof config.success === 'function',
-    'Function "success" is required'
+    'Config "success" (function) is required'
   )
 
   configKey = action

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+require('dotenv').config()
 
 const colors = require('colors')
 const clear = require('clear')
@@ -14,7 +15,7 @@ program.version(version)
 // clear()
 
 // console.log(
-//   colors.rainbow(figlet.textSync('TestSuite', { horizontalLayout: 'full' }))
+//   colors.rainbow(figlet.textSync(process.env.APP_NAME, { horizontalLayout: 'full' }))
 // )
 const commands = require('../src/commands')
 
@@ -22,8 +23,16 @@ const error = (message) => {
   console.log(colors.red(message))
 }
 
-const success = (message) => {
-  console.log(colors.green(message))
+const success = (message, title) => {
+  let fullMessage = ''
+
+  if (title) {
+    fullMessage = `${title}: `
+  }
+
+  fullMessage += colors.green(message)
+
+  console.log(fullMessage)
 }
 
 commands.forEach((prog) => {

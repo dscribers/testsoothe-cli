@@ -37,7 +37,7 @@ const successMessage = (project, log) => {
   config.delete('features')
   config.delete('scenarios')
   config.delete('flows')
-  log(`Current project: <id: ${project.id}> ${project.name}`)
+  log(project.name, `Current project`)
 }
 
 module.exports = (program, { error, success }) => {
@@ -50,6 +50,7 @@ module.exports = (program, { error, success }) => {
         createUrl,
         defaultData,
         getQuestions,
+        labelKey: 'name',
         success: (project) => successMessage(project, success),
       })
 

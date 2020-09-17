@@ -1,1 +1,1 @@
-module.exports = ['auth', 'projects', 'features', 'scenarios', 'flows']
+module.exports = ['ping', 'auth', 'projects', 'features', 'scenarios', 'flows', 'selections', 'test']
