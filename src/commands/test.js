@@ -30,7 +30,7 @@ module.exports = (program, { error, success }) => {
 
       const id = config.get(`${type}s.current`)
       const label = config.get(`${type}s.label`)
-      const url = `${process.env.DOMAIN_URL}/test/${type}/${id}`
+      const url = `${process.env.DOMAIN_URL}/goto/runner?${type}=${id}`
 
       await open(url)
 
