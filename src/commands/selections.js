@@ -10,5 +10,9 @@ module.exports = (program, { error, success }) => {
       )
 
       types.forEach((type) => success(config.get(`${type}s.label`), type))
+
+      if (!types.length) {
+        error('No selections made yet');
+      }
     })
 }

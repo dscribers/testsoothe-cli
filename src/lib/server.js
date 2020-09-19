@@ -51,7 +51,7 @@ const getToken = async (email) => {
       config.set('auth.token', data.token)
 
       if (data.runner_key) {
-        config.set('auth.key', data.runner_key)
+        config.set('auth.runner_key', data.runner_key)
       }
 
       return { email: credentials.email, token: data.token }

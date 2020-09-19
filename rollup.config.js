@@ -1,15 +1,13 @@
 import resolve from '@rollup/plugin-node-resolve'
 import json from '@rollup/plugin-json'
-import commonjs from '@rollup/plugin-commonjs'
 import babel from 'rollup-plugin-babel'
+import shebang from 'rollup-plugin-preserve-shebang'
 import { terser } from 'rollup-plugin-terser'
-
-const output = 'dist/testsuite.js'
 
 const plugins = () => {
   return [
+    shebang(),
     resolve(),
-    commonjs(),
     json(),
     babel({
       exclude: 'node_modules/**', // only transpile our source code
@@ -19,13 +17,11 @@ const plugins = () => {
 }
 
 export default {
-  input: 'src/bin/index.js',
-  output: [
-    {
-      file: output,
-      format: 'cjs',
-    },
-  ],
+  input: 'bin/index.js',
+  output: {
+    file: 'dist/index.js',
+    format: 'cjs',
+  },
   plugins: plugins(),
   external: [
     'assert',
