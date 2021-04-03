@@ -1,17 +1,20 @@
-# for local development
 version: "3.7"
 services:
   cli:
     build:
       context: .
       target: "develop-stage"
+    environment:
+      DEBUGGING_PORT: ${TEST_DEBUGGING_PORT}
     volumes:
-      - ".:/app"
+      - .:/app
+    ports:
+      - ${TEST_DEBUGGING_PORT}:${TEST_DEBUGGING_PORT}
     tty: true
     networks:
-      - testsuite_backend
+      - testsoothe
 
 networks:
-  testsuite_backend:
+  testsoothe:
      external:
-      name: testsuite_backend_external
+      name: testsoothe

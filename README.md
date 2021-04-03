@@ -1,6 +1,6 @@
 # testsuite-cli
 
-A command-line utility app for TestSuite.
+A command-line utility app for TestSoothe.
 
 ## Installation
 

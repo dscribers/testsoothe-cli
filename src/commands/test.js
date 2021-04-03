@@ -1,6 +1,6 @@
 const inquirer = require('inquirer')
 const config = require('../lib/config')
-const open = require('open')
+const runTest = require('../lib/runTest')
 
 module.exports = (program, { error, success }) => {
   program
@@ -31,11 +31,10 @@ module.exports = (program, { error, success }) => {
       const id = config.get(`${type}s.current`)
       const label = config.get(`${type}s.label`)
       const runnerKey = config.get('auth.runner_key')
-      const url = `${process.env.DOMAIN_URL}/goto/runner?${type}=${id}&key=${runnerKey}`
+      const url = `${process.env.DOMAIN_URL}/goto/runner?${type}=${id}&key=${runnerKey}&logs=1`
 
-      await open(url)
+      success(`${type} [${label}]`, 'Starting runner ...')
 
-      console.log()
-      success(`${type} [${label}]`, 'Running in the browser')
+      runTest(url)
     })
 }
