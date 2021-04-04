@@ -2,7 +2,7 @@ const chromeLauncher = require('chrome-launcher')
 const CDP = require('chrome-remote-interface')
 const colors = require('colors')
 
-export const terminal = {
+const terminal = {
     error (text) {
         console.log(colors.red(text))
     },
@@ -14,8 +14,12 @@ export const terminal = {
     }
 }
 
-export default async function (url = 'https://example.com', consoleTextPrefix = 'DEBUGGING: ') {
+module.exports = async function (url, consoleTextPrefix = 'DEBUGGING: ') {
     try {
+        if (!url) {
+            throw new Error('No url received')
+        }
+
         async function launchChrome () {
             return await chromeLauncher.launch({
                 port: process.env.DEBUGGING_PORT,
@@ -29,9 +33,7 @@ export default async function (url = 'https://example.com', consoleTextPrefix = 
         }
 
         const chrome = await launchChrome()
-        const protocol = await CDP({
-            port: chrome.port
-        })
+        const protocol = await CDP({ port: chrome.port })
 
         const {
             DOM,
@@ -45,8 +47,9 @@ export default async function (url = 'https://example.com', consoleTextPrefix = 
         await Promise.all([Network.enable(), Page.enable(), DOM.enable(), Runtime.enable(), Console.enable()])
 
         const doneLogText = 'FINISHED'
+        const fullUrl = `${url}&logPrefix=${encodeURIComponent(consoleTextPrefix)}&doneLogText=${encodeURIComponent(doneLogText)}`
 
-        await Page.navigate({ url: `${url}&logPrefix=${consoleTextPrefix}&doneLogText=${doneLogText}` })
+        await Page.navigate({ url: fullUrl })
 
         Console.messageAdded(({ level, text }) => {
             if (!text.startsWith(consoleTextPrefix)) {

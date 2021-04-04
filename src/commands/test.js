@@ -31,9 +31,9 @@ module.exports = (program, { error, success }) => {
       const id = config.get(`${type}s.current`)
       const label = config.get(`${type}s.label`)
       const runnerKey = config.get('auth.runner_key')
-      const url = `${process.env.DOMAIN_URL}/goto/runner?${type}=${id}&key=${runnerKey}&logs=1`
+      const url = `${process.env.DOMAIN_URL}/view?action=runner&type=${type}&id=${id}&key=${runnerKey}&logs=1`
 
-      success(`${type} [${label}]`, 'Starting runner ...')
+      success(`${type} [${label}]`, 'Starting runner')
 
       runTest(url)
     })
