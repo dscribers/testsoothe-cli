@@ -22,17 +22,20 @@ module.exports = async function (url, consoleTextPrefix = 'DEBUGGING: ') {
 
         async function launchChrome () {
             return await chromeLauncher.launch({
-                port: process.env.DEBUGGING_PORT,
                 chromeFlags: [
                     '--headless',
                     '--disable-gpu',
+                    '--enable-automation',
                     '--no-sandbox',
                     '--disable-dev-shm-usage',
-                ]
+                ],
+                port: process.env.DEBUGGING_PORT,
+                // logLevel: 'verbose'
             })
         }
 
         const chrome = await launchChrome()
+
         const protocol = await CDP({ port: chrome.port })
 
         const {
@@ -40,31 +43,39 @@ module.exports = async function (url, consoleTextPrefix = 'DEBUGGING: ') {
             Network,
             Page,
             Emulation,
-            Runtime,
-            Console
+            Runtime
         } = protocol
 
-        await Promise.all([Network.enable(), Page.enable(), DOM.enable(), Runtime.enable(), Console.enable()])
+        await Promise.all([Network.enable(), Page.enable(), DOM.enable(), Runtime.enable()])
 
         const doneLogText = 'FINISHED'
         const fullUrl = `${url}&logPrefix=${encodeURIComponent(consoleTextPrefix)}&doneLogText=${encodeURIComponent(doneLogText)}`
 
         await Page.navigate({ url: fullUrl })
 
-        Console.messageAdded(({ level, text }) => {
-            if (!text.startsWith(consoleTextPrefix)) {
-                return
-            }
+        Runtime.consoleAPICalled(({ type, args }) => {
+            args.forEach(({ value }) => {
+                if (!value.startsWith(consoleTextPrefix)) {
+                    return
+                }
 
-            const message = text.replace(consoleTextPrefix, '')
+                const text = value.replace(consoleTextPrefix, '')
 
-            if (message === doneLogText) {
-                protocol.close()
-                return chrome.kill()
-            }
+                if (text === doneLogText) {
+                    protocol.close()
 
-            terminal[level](message)
+                    return chrome.kill()
+                }
+
+                if (!terminal[type]) {
+                    return
+                }
+
+                terminal[type](text)
+            })
         })
+
+        Page.loadEventFired()
     } catch (error) {
         terminal.error(error)
     }

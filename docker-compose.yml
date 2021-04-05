@@ -1,6 +1,8 @@
 version: "3.7"
+
 services:
   cli:
+    # image: testsoothe/cli
     build:
       context: .
       target: "develop-stage"
@@ -11,6 +13,7 @@ services:
     ports:
       - ${TEST_DEBUGGING_PORT}:${TEST_DEBUGGING_PORT}
     tty: true
+    stdin_open: true
     networks:
       - testsoothe
 

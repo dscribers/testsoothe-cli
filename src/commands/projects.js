@@ -3,11 +3,11 @@ const command = path.basename(__filename, '.js')
 const template = require('./template')
 const config = require('../lib/config')
 
-const createUrl = (id) => {
+const createUrl = (pid) => {
   let url = '/projects'
 
-  if (id) {
-    url += `/${id}`
+  if (pid) {
+    url += `/${pid}`
   } else {
     url += '?length=all'
   }
@@ -20,24 +20,24 @@ const defaultData = []
 const getQuestions = (projects, current) => {
   return [
     {
-      name: 'id',
+      name: 'pid',
       type: 'list',
       message: 'Select a project',
       default: current,
-      choices: projects.map(({ id, name }) => ({
-        name,
-        short: name,
-        value: id,
+      choices: projects.map(({ pid, name }) => ({
+        name: `${name} [${pid}]`,
+        short: pid,
+        value: pid,
       })),
     },
   ]
 }
 
-const successMessage = (project, log) => {
+const successMessage = ({ name, pid }, log) => {
   config.delete('features')
   config.delete('scenarios')
   config.delete('flows')
-  log(project.name, `Current project`)
+  log(`${name} [${pid}]`, `Current project`)
 }
 
 module.exports = (program, { error, success }) => {
@@ -45,7 +45,7 @@ module.exports = (program, { error, success }) => {
     .command('projects [id]')
     .option('-f --fresh', "creates a fresh projects' cache")
     .description('select a project')
-    .action((id, { fresh }) => {
+    .action((pid, { fresh }) => {
       const { select, showList } = template(command, {
         createUrl,
         defaultData,
@@ -54,6 +54,6 @@ module.exports = (program, { error, success }) => {
         success: (project) => successMessage(project, success),
       })
 
-      return id ? select(id, fresh, error) : showList(fresh, error)
+      return pid ? select(pid, fresh, error) : showList(fresh, error)
     })
 }
