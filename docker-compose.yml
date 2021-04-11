@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   cli:
-    image: testsoothe/cli
+    image: dscribe/testsoothe-cli
     build:
       context: .
     environment:

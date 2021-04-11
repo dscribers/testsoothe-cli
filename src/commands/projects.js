@@ -44,7 +44,7 @@ const successMessage = ({ name, pid }, log) => {
 module.exports = program => {
   program
     .command('projects [id]')
-    .option('-f --fresh', "creates a fresh projects' cache")
+    .option('-f, --fresh', "creates a fresh projects' cache")
     .description('select a project')
     .action((pid, { fresh }) => {
       const { select, showList } = template(command, {

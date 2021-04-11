@@ -40,7 +40,7 @@ const successMessage = ({ name, pid }, log) => log(`${name} [${pid}]`, `Current 
 module.exports = program => {
   program
     .command('flows [id]')
-    .option('-f --fresh', "creates a fresh flows' cache")
+    .option('-f, --fresh', "creates a fresh flows' cache")
     .description('select a flow')
     .action((pid, { fresh }) => {
       if (!config.has('projects.current')) {

@@ -43,7 +43,7 @@ const successMessage = ({ title, pid }, log) => {
 module.exports = program => {
   program
     .command('features [id]')
-    .option('-f --fresh', "creates a fresh features' cache")
+    .option('-f, --fresh', "creates a fresh features' cache")
     .description('select a feature')
     .action((pid, { fresh }) => {
       if (!config.has('projects.current')) {

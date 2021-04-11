@@ -13,9 +13,15 @@ const terminal = {
     }
 }
 
-module.exports = async (url, consoleTextPrefix = 'DEBUGGING: ') => {
+module.exports = async (url, consoleTextPrefix = '[CLI] ') => {
     const browser = await puppeteer.launch({
-        args: ['--disable-dev-shm-usage', '--no-sandbox', '--disable-setuid-sandbox']
+        args: [
+            '--disable-dev-shm-usage',
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            `--remote-debugging-port=${process.env.DEBUGGING_PORT || 9222}`,
+            '--remote-debugging-address=0.0.0.0',
+        ]
     })
     const doneLogText = 'FINISHED'
 
@@ -37,9 +43,7 @@ module.exports = async (url, consoleTextPrefix = 'DEBUGGING: ') => {
             text = text.replace(consoleTextPrefix, '').trim()
 
             if (text === doneLogText) {
-                protocol.close()
-
-                return chrome.kill()
+                return browser.close()
             }
 
             if (!terminal[type]) {
@@ -52,7 +56,6 @@ module.exports = async (url, consoleTextPrefix = 'DEBUGGING: ') => {
         await page.goto(`${url}&logPrefix=${encodeURIComponent(consoleTextPrefix)}&doneLogText=${encodeURIComponent(doneLogText)}`)
     } catch (error) {
         terminal.error(error)
-    } finally {
         await browser.close()
     }
 }

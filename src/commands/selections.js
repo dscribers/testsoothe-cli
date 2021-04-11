@@ -10,7 +10,12 @@ module.exports = program => {
         config.has(`${type}s.current`)
       )
 
-      types.forEach((type) => success(config.get(`${type}s.label`), type))
+      types.forEach((type) => {
+        const label = config.get(`${type}s.label`)
+        const id = config.get(`${type}s.current`)
+
+        success(`${label} [${id}]`, type)
+      })
 
       if (!types.length) {
         error('No selections made yet');

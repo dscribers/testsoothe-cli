@@ -41,7 +41,7 @@ const successMessage = ({ title, pid }, log) =>
 module.exports = program => {
   program
     .command('scenarios [id]')
-    .option('-f --fresh', "creates a fresh scenarios' cache")
+    .option('-f, --fresh', "creates a fresh scenarios' cache")
     .description('select a scenario')
     .action((pid, { fresh }) => {
       if (!config.has('features.current')) {
