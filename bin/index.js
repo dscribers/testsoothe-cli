@@ -19,22 +19,6 @@ program.version(version)
 // )
 const commands = require('../src/commands')
 
-const error = (message) => {
-  console.log(colors.red(message))
-}
-
-const success = (message, title) => {
-  let fullMessage = ''
-
-  if (title) {
-    fullMessage = `${title}: `
-  }
-
-  fullMessage += colors.green(message)
-
-  console.log(fullMessage)
-}
-
 commands.forEach((prog) => {
   require(`../src/commands/${prog}`)(program, { success, error })
 })

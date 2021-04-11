@@ -2,22 +2,29 @@ version: "3.7"
 
 services:
   cli:
-    # image: testsoothe/cli
+    image: testsoothe/cli
     build:
       context: .
-      target: "develop-stage"
     environment:
       DEBUGGING_PORT: ${TEST_DEBUGGING_PORT}
     volumes:
       - .:/app
     ports:
       - ${TEST_DEBUGGING_PORT}:${TEST_DEBUGGING_PORT}
+    user: 1000:1000
     tty: true
     stdin_open: true
+    volumes:
+      - home-dir:/home/node/
+      - .:/app
     networks:
       - testsoothe
+
+volumes:
+  home-dir:
 
 networks:
   testsoothe:
      external:
       name: testsoothe
+

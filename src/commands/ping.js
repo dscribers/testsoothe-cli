@@ -1,6 +1,7 @@
 const { loading, http } = require('../lib/server')
+const { error, success } = require('../lib/logger')
 
-module.exports = (program, { error, success }) => {
+module.exports = program => {
   program
     .command('ping')
     .description('pings the server')

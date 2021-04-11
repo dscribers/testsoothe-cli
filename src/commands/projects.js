@@ -2,6 +2,7 @@ const path = require('path')
 const command = path.basename(__filename, '.js')
 const template = require('./template')
 const config = require('../lib/config')
+const { error, success } = require('../lib/logger')
 
 const createUrl = (pid) => {
   let url = '/projects'
@@ -40,7 +41,7 @@ const successMessage = ({ name, pid }, log) => {
   log(`${name} [${pid}]`, `Current project`)
 }
 
-module.exports = (program, { error, success }) => {
+module.exports = program => {
   program
     .command('projects [id]')
     .option('-f --fresh', "creates a fresh projects' cache")

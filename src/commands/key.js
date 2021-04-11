@@ -1,8 +1,8 @@
-const inquirer = require('inquirer')
 const config = require('../lib/config')
-const open = require('open')
+const prompt = require('../lib/prompt')
+const { error, info, success } = require('../lib/logger')
 
-module.exports = (program, { error, success }) => {
+module.exports = program => {
   program
     .command('key')
     .description('shows the runner key or prompts to create one if not set')
@@ -10,22 +10,22 @@ module.exports = (program, { error, success }) => {
       let key = config.get('auth.runner_key')
 
       if (!key) {
-        await open(`${process.env.DOMAIN_URL}/goto/runner.info`)
+        info(`Get your key from ${process.env.DOMAIN_URL}/goto/runner.info`)
 
-        try {
-          const resp = await inquirer.prompt([
-            {
-              name: 'key',
-              message: 'Enter your runner key:',
-            },
-          ])
+        const { key: respKey } = await prompt([
+          {
+            name: 'key',
+            message: 'Enter your runner key:',
+          },
+        ])
 
-          key = resp.key
-
-          config.set('auth.runner_key', key)
-        } catch (e) {
-          error(e.message)
+        if (!$respKey) {
+          return error('No runner key set.')
         }
+
+        key = respKey
+
+        config.set('auth.runner_key', key)
       } else {
         key = key.replace(
           /[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-/gi,

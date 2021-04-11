@@ -1,8 +1,9 @@
-const inquirer = require('inquirer')
 const config = require('../lib/config')
 const runTest = require('../lib/runTest')
+const prompt = require('../lib/prompt')
+const { success } = require('../lib/logger')
 
-module.exports = (program, { error, success }) => {
+module.exports = program => {
   program
     .command('test')
     .description('starts a test')
@@ -19,7 +20,7 @@ module.exports = (program, { error, success }) => {
           }
         })
 
-      const { type } = await inquirer.prompt([
+      const { type } = await prompt([
         {
           name: 'type',
           type: 'list',

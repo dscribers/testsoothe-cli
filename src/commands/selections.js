@@ -1,6 +1,7 @@
 const config = require('../lib/config')
+const { error, success } = require('../lib/logger')
 
-module.exports = (program, { error, success }) => {
+module.exports = program => {
   program
     .command('selections')
     .description('show active selections')

@@ -1,18 +1,19 @@
 const colors = require('colors')
 const { login, logout } = require('../lib/server')
+const { error, success } = require('../lib/logger')
 
-module.exports = (program, { error, success }) => {
+module.exports = program => {
   program
     .command('login [email]')
     .description('logs a new user in')
     .action(async (defEmail) => {
-      try {
-        const { email } = await login(false, defEmail)
+      const { email } = await login(false, defEmail)
 
-        success(`Logged in (${colors.italic(email)})`)
-      } catch (e) {
-        error(e.message)
+      if (!email) {
+        return
       }
+
+      success(`Logged in (${colors.italic(email)})`)
     })
 
   program

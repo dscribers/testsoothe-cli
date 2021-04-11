@@ -1,5 +1,4 @@
-const chromeLauncher = require('chrome-launcher')
-const CDP = require('chrome-remote-interface')
+const puppeteer = require('puppeteer')
 const colors = require('colors')
 
 const terminal = {
@@ -14,69 +13,46 @@ const terminal = {
     }
 }
 
-module.exports = async function (url, consoleTextPrefix = 'DEBUGGING: ') {
+module.exports = async (url, consoleTextPrefix = 'DEBUGGING: ') => {
+    const browser = await puppeteer.launch({
+        args: ['--disable-dev-shm-usage', '--no-sandbox', '--disable-setuid-sandbox']
+    })
+    const doneLogText = 'FINISHED'
+
     try {
         if (!url) {
             throw new Error('No url received')
         }
 
-        async function launchChrome () {
-            return await chromeLauncher.launch({
-                chromeFlags: [
-                    '--headless',
-                    '--disable-gpu',
-                    '--enable-automation',
-                    '--no-sandbox',
-                    '--disable-dev-shm-usage',
-                ],
-                port: process.env.DEBUGGING_PORT,
-                // logLevel: 'verbose'
-            })
-        }
+        const page = await browser.newPage()
 
-        const chrome = await launchChrome()
+        page.on('console', msg => {
+            const type = msg.type()
+            let text = msg.text()
 
-        const protocol = await CDP({ port: chrome.port })
+            if (!text.startsWith(consoleTextPrefix)) {
+                return
+            }
 
-        const {
-            DOM,
-            Network,
-            Page,
-            Emulation,
-            Runtime
-        } = protocol
+            text = text.replace(consoleTextPrefix, '').trim()
 
-        await Promise.all([Network.enable(), Page.enable(), DOM.enable(), Runtime.enable()])
+            if (text === doneLogText) {
+                protocol.close()
 
-        const doneLogText = 'FINISHED'
-        const fullUrl = `${url}&logPrefix=${encodeURIComponent(consoleTextPrefix)}&doneLogText=${encodeURIComponent(doneLogText)}`
+                return chrome.kill()
+            }
 
-        await Page.navigate({ url: fullUrl })
+            if (!terminal[type]) {
+                return
+            }
 
-        Runtime.consoleAPICalled(({ type, args }) => {
-            args.forEach(({ value }) => {
-                if (!value.startsWith(consoleTextPrefix)) {
-                    return
-                }
-
-                const text = value.replace(consoleTextPrefix, '')
-
-                if (text === doneLogText) {
-                    protocol.close()
-
-                    return chrome.kill()
-                }
-
-                if (!terminal[type]) {
-                    return
-                }
-
-                terminal[type](text)
-            })
+            terminal[type](text)
         })
 
-        Page.loadEventFired()
+        await page.goto(`${url}&logPrefix=${encodeURIComponent(consoleTextPrefix)}&doneLogText=${encodeURIComponent(doneLogText)}`)
     } catch (error) {
         terminal.error(error)
+    } finally {
+        await browser.close()
     }
 }

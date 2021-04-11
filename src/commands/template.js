@@ -1,6 +1,7 @@
 const { loading, login, http } = require('../lib/server')
+const { error } = require('../lib/logger')
 const config = require('../lib/config')
-const inquirer = require('inquirer')
+const prompt = require('../lib/prompt')
 const clear = require('clear')
 
 let configKey = null
@@ -16,7 +17,11 @@ const showList = async (fresh, error) => {
 
     const current = config.get(`${configKey}.current`)
 
-    const { pid } = await inquirer.prompt(settings.getQuestions(items, current))
+    const { pid } = await prompt(settings.getQuestions(items, current))
+
+    if (!pid) {
+      return
+    }
 
     await select(pid, false, error)
   } catch (e) {
@@ -58,15 +63,13 @@ const fetch = async (fresh = false, pid) => {
 
   if (Array.isArray(serverItems)) {
     items = fresh ? serverItems : [...items, ...serverItems]
-  } else {
-    if (fresh) {
-      const index = items.findIndex(({ pid }) => pid === serverItems.pid)
+  } else if (fresh) {
+    const index = items.findIndex(({ pid }) => pid === serverItems.pid)
 
-      if (index > -1) {
-        items.splice(index, 1, serverItems)
-      } else {
-        items.push(serverItems)
-      }
+    if (index > -1) {
+      items.splice(index, 1, serverItems)
+    } else {
+      items.push(serverItems)
     }
   }
 
@@ -77,8 +80,11 @@ const fetch = async (fresh = false, pid) => {
 
 const fetchFromServer = async (pid) => {
   if (settings.auth !== false) {
-    await login()
-    console.log
+    const { email } = await login()
+
+    if (!email) {
+      return []
+    }
   }
 
   let loader

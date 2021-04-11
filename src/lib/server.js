@@ -2,7 +2,7 @@ const { Spinner } = require('clui')
 
 const config = require('./config')
 const http = require('./http')
-const inquirer = require('inquirer')
+const prompt = require('./prompt')
 
 const getCredentials = (email) => {
   const questions = [
@@ -35,26 +35,31 @@ const getCredentials = (email) => {
     },
   ]
 
-  return inquirer.prompt(questions)
+  return prompt(questions)
 }
 
 const getToken = async (email) => {
-  const credentials = await getCredentials(email || config.get('auth.email'))
+  const { email: newEmail, password } = await getCredentials(email || config.get('auth.email'))
+
+  if (!newEmail || !password) {
+    return {}
+  }
+
   let loader
 
   try {
-    loader = loading(`Logging ${credentials.email} in`)
-    const { data } = await http.post('/auth/login?cmd=1', credentials)
+    loader = loading(`Logging ${newEmail} in`)
+    const { data } = await http.post('/auth/login?cmd=1', { email: newEmail, password })
 
     if (data.token) {
-      config.set('auth.email', credentials.email)
+      config.set('auth.email', newEmail)
       config.set('auth.token', data.token)
 
       if (data.runner_key) {
         config.set('auth.runner_key', data.runner_key)
       }
 
-      return { email: credentials.email, token: data.token }
+      return { email: newEmail, token: data.token }
     } else {
       throw new Error(
         process.env.APP_NAME + ' token was not found in the response'
