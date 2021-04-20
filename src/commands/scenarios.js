@@ -4,11 +4,11 @@ const template = require('./template')
 const config = require('../lib/config')
 const { error, success } = require('../lib/logger')
 
-const createUrl = (pid) => {
+const createUrl = (id) => {
   let url
 
-  if (pid) {
-    url = `/scenarios/${pid}`
+  if (id) {
+    url = `/scenarios/${id}`
   } else {
     const featureId = config.get('features.current')
     url = `/features/${featureId}/scenarios?length=all`
@@ -22,28 +22,28 @@ const defaultData = []
 const getQuestions = (scenarios, current) => {
   return [
     {
-      name: 'pid',
+      name: 'id',
       type: 'list',
       message: 'Select a scenario',
       default: current,
-      choices: scenarios.map(({ pid, title }) => ({
-        name: `${title} [${pid}]`,
-        short: pid,
-        value: pid,
+      choices: scenarios.map(({ id, title }) => ({
+        name: `${title} [${id}]`,
+        short: id,
+        value: id,
       })),
     },
   ]
 }
 
-const successMessage = ({ title, pid }, log) =>
-  log(`${title} [${pid}]`, `Current scenario`)
+const successMessage = ({ title, id }, log) =>
+  log(`${title} [${id}]`, `Current scenario`)
 
 module.exports = program => {
   program
     .command('scenarios [id]')
     .option('-f, --fresh', "creates a fresh scenarios' cache")
     .description('select a scenario')
-    .action((pid, { fresh }) => {
+    .action((id, { fresh }) => {
       if (!config.has('features.current')) {
         return error('No feature selected')
       }
@@ -56,6 +56,6 @@ module.exports = program => {
         success: (item) => successMessage(item, success),
       })
 
-      return pid ? select(pid, fresh, error) : showList(fresh, error)
+      return id ? select(id, fresh, error) : showList(fresh, error)
     })
 }

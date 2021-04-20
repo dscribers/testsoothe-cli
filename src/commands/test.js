@@ -1,7 +1,7 @@
 const config = require('../lib/config')
 const runTest = require('../lib/runTest')
 const prompt = require('../lib/prompt')
-const { success } = require('../lib/logger')
+const { error, success } = require('../lib/logger')
 
 module.exports = program => {
   program
@@ -11,7 +11,14 @@ module.exports = program => {
     .option('-f, --feature <feature_id>', 'run test on a feature')
     .option('-s, --scenario <scenario_id>', 'run test on a scenario')
     .option('-l, --flow <flow_id>', 'run test on a flow')
-    .action(async ({ project, feature, scenario, flow }) => {
+    .option('-k, --runner-key <key>', 'runner key')
+    .action(async ({ project, feature, scenario, flow, runnerKey }) => {
+      runnerKey = runnerKey || config.get('auth.runner_key')
+
+      if (!runnerKey) {
+        return error('Runner key not set')
+      }
+
       let id, type
 
       if (project) {
@@ -56,7 +63,6 @@ module.exports = program => {
         id = config.get(`${type}s.current`)
       }
 
-      const runnerKey = config.get('auth.runner_key')
       const url = `${process.env.DOMAIN_URL}/view?action=runner&type=${type}&id=${id}&key=${runnerKey}&logs=1`
 
       success(`${type} [${id}]`, 'Starting runner')

@@ -1,12 +1,22 @@
 const puppeteer = require('puppeteer')
 const colors = require('colors')
+const { error, info, success } = require('log-symbols')
 
 const terminal = {
+    lineFails (text) {
+        console.log(colors.red(error), colors.red(text))
+    },
+    lineSuccess (text) {
+        console.log(colors.green(success), colors.green(text))
+    },
+    scenarioStarts (text) {
+        console.log(colors.bgBlue.white(info), colors.bgBlue.white(text))
+    },
     error (text) {
-        console.log(colors.red(text))
+        console.log(colors.red(error), colors.red(text))
     },
     info (text) {
-        console.log(colors.blue(text))
+        console.log(colors.green(success), colors.green(text))
     },
     log (text) {
         console.log(text)

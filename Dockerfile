@@ -21,11 +21,13 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 WORKDIR /app
 
-COPY package.json ./
-COPY yarn.lock ./
+RUN chown 1000:1000 /app
+
+USER 1000:1000
+
+COPY --chown=1000:1000 package.json ./
+COPY --chown=1000:1000 yarn.lock ./
 
 RUN yarn
 
-RUN yarn link
-
-COPY . .
+COPY --chown=1000:1000 . .

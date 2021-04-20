@@ -20,7 +20,7 @@ program.version(version)
 const commands = require('../src/commands')
 
 commands.forEach((prog) => {
-  require(`../src/commands/${prog}`)(program, { success, error })
+  require(`../src/commands/${prog}`)(program)
 })
 
 program.parse(process.argv)

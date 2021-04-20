@@ -19,6 +19,7 @@
     "figlet": "^1.4.0",
     "inquirer": "^7.1.0",
     "lodash": "^4.17.15",
+    "log-symbols": "^4.1.0",
     "puppeteer": "^6.0.0"
   },
   "devDependencies": {

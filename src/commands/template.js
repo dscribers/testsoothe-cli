@@ -17,23 +17,23 @@ const showList = async (fresh, error) => {
 
     const current = config.get(`${configKey}.current`)
 
-    const { pid } = await prompt(settings.getQuestions(items, current))
+    const { id } = await prompt(settings.getQuestions(items, current))
 
-    if (!pid) {
+    if (!id) {
       return
     }
 
-    await select(pid, false, error)
+    await select(id, false, error)
   } catch (e) {
     return error(e.message)
   }
 }
 
-const select = async (pid, fresh, error) => {
+const select = async (id, fresh, error) => {
   try {
-    const item = await fetch(fresh, pid)
+    const item = await fetch(fresh, id)
 
-    config.set(`${configKey}.current`, item.pid)
+    config.set(`${configKey}.current`, item.id)
     config.set(`${configKey}.label`, item[settings.labelKey])
 
     console.log()
@@ -43,13 +43,13 @@ const select = async (pid, fresh, error) => {
   }
 }
 
-const fetch = async (fresh = false, pid) => {
+const fetch = async (fresh = false, id) => {
   const storedItems = config.get(configKey)
   let items = (storedItems || {}).list || settings.defaultData || []
 
   if (!fresh) {
-    if (pid) {
-      const single = items.find((project) => `${project.pid}` === `${pid}`)
+    if (id) {
+      const single = items.find((project) => `${project.id}` === `${id}`)
 
       if (single) {
         return single
@@ -59,12 +59,12 @@ const fetch = async (fresh = false, pid) => {
     }
   }
 
-  const serverItems = await fetchFromServer(pid)
+  const serverItems = await fetchFromServer(id)
 
   if (Array.isArray(serverItems)) {
     items = fresh ? serverItems : [...items, ...serverItems]
   } else if (fresh) {
-    const index = items.findIndex(({ pid }) => pid === serverItems.pid)
+    const index = items.findIndex(({ id }) => id === serverItems.id)
 
     if (index > -1) {
       items.splice(index, 1, serverItems)
@@ -75,10 +75,10 @@ const fetch = async (fresh = false, pid) => {
 
   config.set(`${configKey}.list`, items)
 
-  return pid ? serverItems : items
+  return id ? serverItems : items
 }
 
-const fetchFromServer = async (pid) => {
+const fetchFromServer = async (id) => {
   if (settings.auth !== false) {
     const { email } = await login()
 
@@ -92,13 +92,13 @@ const fetchFromServer = async (pid) => {
   try {
     let message = `Fetching ${configKey}`
 
-    if (pid) {
-      message += `(${pid})`
+    if (id) {
+      message += `(${id})`
     }
 
     loader = loading(message)
 
-    const url = settings.createUrl(pid)
+    const url = settings.createUrl(id)
     const { data } = await http.get(url)
 
     return data
