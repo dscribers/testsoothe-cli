@@ -1,8 +1,7 @@
-const { Spinner } = require('clui')
-
 const config = require('./config')
 const http = require('./http')
 const prompt = require('./prompt')
+const spinner = require('./spinner')
 
 const getCredentials = (email) => {
   const questions = [
@@ -45,10 +44,10 @@ const getToken = async (email) => {
     return {}
   }
 
-  let loader
+  const loader = spinner(`Logging ${newEmail} in`)
+  loader.start()
 
   try {
-    loader = loading(`Logging ${newEmail} in`)
     const { data } = await http.post('/auth/login?cmd=1', { email: newEmail, password })
 
     if (data.token) {
@@ -84,16 +83,6 @@ const isValidToken = async () => {
   }
 }
 
-const loading = (message = '', start = true) => {
-  const spinner = new Spinner(message)
-
-  if (start) {
-    spinner.start()
-  }
-
-  return spinner
-}
-
 const login = async (force, email) => {
   if (!email) {
     const profile = await isValidToken()
@@ -125,7 +114,6 @@ const logout = () => {
 
 module.exports = {
   http,
-  loading,
   login,
   logout,
 }

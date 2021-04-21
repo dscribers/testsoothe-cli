@@ -1,8 +1,9 @@
-const { loading, login, http } = require('../lib/server')
+const { login, http } = require('../lib/server')
 const { error } = require('../lib/logger')
 const config = require('../lib/config')
 const prompt = require('../lib/prompt')
 const clear = require('clear')
+const spinner = require('../lib/spinner')
 
 let configKey = null
 let settings = {}
@@ -87,16 +88,16 @@ const fetchFromServer = async (id) => {
     }
   }
 
-  let loader
+  let message = `Fetching ${configKey}`
+
+  if (id) {
+    message += `(${id})`
+  }
+
+  const loader = spinner(message)
+  loader.start()
 
   try {
-    let message = `Fetching ${configKey}`
-
-    if (id) {
-      message += `(${id})`
-    }
-
-    loader = loading(message)
 
     const url = settings.createUrl(id)
     const { data } = await http.get(url)
