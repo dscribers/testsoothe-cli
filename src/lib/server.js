@@ -3,7 +3,7 @@ const http = require('./http')
 const prompt = require('./prompt')
 const spinner = require('./spinner')
 
-const getCredentials = (email) => {
+const getCredentials = email => {
   const questions = [
     {
       name: 'email',
@@ -37,7 +37,7 @@ const getCredentials = (email) => {
   return prompt(questions)
 }
 
-const getToken = async (email) => {
+const getToken = async email => {
   const { email: newEmail, password } = await getCredentials(email || config.get('auth.email'))
 
   if (!newEmail || !password) {
@@ -48,7 +48,7 @@ const getToken = async (email) => {
   loader.start()
 
   try {
-    const { data } = await http.post('/auth/login?cmd=1', { email: newEmail, password })
+    const { data } = await http.post('/auth/login?cmd=1', { email: newEmail, password, source: 'cli' })
 
     if (data.token) {
       config.set('auth.email', newEmail)

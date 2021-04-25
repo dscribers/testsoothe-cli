@@ -11,10 +11,10 @@ module.exports = program => {
       loader.start()
 
       try {
-        const { status } = await http.get('/echo')
+        const { message } = await http.get('/ping')
 
         loader.stop()
-        success(status)
+        success(message)
       } catch ({ message }) {
         loader.stop()
         error(message)
