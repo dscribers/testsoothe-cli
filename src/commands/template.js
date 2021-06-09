@@ -3,7 +3,7 @@ const { error } = require('../lib/logger')
 const config = require('../lib/config')
 const prompt = require('../lib/prompt')
 const clear = require('clear')
-const spinner = require('../lib/spinner')
+const spinner = require('ora')
 
 let configKey = null
 let settings = {}
@@ -94,8 +94,7 @@ const fetchFromServer = async (id) => {
     message += `(${id})`
   }
 
-  const loader = spinner(message)
-  loader.start()
+  const loader = spinner(message).start()
 
   try {
 

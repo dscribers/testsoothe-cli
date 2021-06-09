@@ -1,5 +1,5 @@
 # develop stage
-FROM node:14.3-alpine
+FROM node:16.3-alpine
 
 RUN apk update && apk add --no-cache nmap
 RUN echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
@@ -15,6 +15,10 @@ RUN apk add --no-cache \
   nss \
   libc6-compat \
   udev
+RUN python3 \
+  build-base \
+  make \
+  g++
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
@@ -31,3 +35,5 @@ COPY --chown=1000:1000 yarn.lock ./
 RUN yarn
 
 COPY --chown=1000:1000 . .
+
+ENV PATH /home/node/.yarn/bin:$PATH

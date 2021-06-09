@@ -1,10 +1,11 @@
 const axios = require('axios')
 const config = require('./config')
+const { apiUrl } = require('./env')
 
 const Http = require('@ezraobiwale/http/dist/node-http')
 
 module.exports = new Http({
-  baseURL: process.env.API_URL,
+  baseURL: apiUrl(),
   transformRequest: [
     (data, headers) => {
       if (config.has('auth.token')) {

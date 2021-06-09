@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+yarn parcel build --no-source-maps src/bin/index.js
+printf '%s\n\n%s\n' "#!/usr/bin/env node" "$(cat dist/index.js)" > dist/index.js
+chmod a+x dist/index.js

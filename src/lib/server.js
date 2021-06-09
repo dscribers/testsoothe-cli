@@ -1,7 +1,8 @@
 const config = require('./config')
 const http = require('./http')
 const prompt = require('./prompt')
-const spinner = require('./spinner')
+const spinner = require('ora')
+const { appName } = require('./env')
 
 const getCredentials = email => {
   const questions = [
@@ -44,8 +45,7 @@ const getToken = async email => {
     return {}
   }
 
-  const loader = spinner(`Logging ${newEmail} in`)
-  loader.start()
+  const loader = spinner(`Logging ${newEmail} in`).start()
 
   try {
     const { data } = await http.post('/auth/login?cmd=1', { email: newEmail, password, source: 'cli' })
@@ -61,7 +61,7 @@ const getToken = async email => {
       return { email: newEmail, token: data.token }
     } else {
       throw new Error(
-        process.env.APP_NAME + ' token was not found in the response'
+        appName() + ' token was not found in the response'
       )
     }
   } finally {

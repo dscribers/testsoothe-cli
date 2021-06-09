@@ -1,6 +1,7 @@
 const config = require('../lib/config')
 const runTest = require('../lib/runTest')
 const prompt = require('../lib/prompt')
+const { domainUrl } = require('../lib/env')
 const { error, success } = require('../lib/logger')
 
 module.exports = program => {
@@ -63,7 +64,7 @@ module.exports = program => {
         id = config.get(`${type}s.current`)
       }
 
-      const url = `${process.env.DOMAIN_URL}/view?action=runner&type=${type}&id=${id}&key=${runnerKey}&logs=1`
+      const url = `${domainUrl()}/view?action=runner&type=${type}&id=${id}&key=${runnerKey}&logs=1`
 
       success(`${type} [${id}]`, 'Starting runner')
 
