@@ -7,7 +7,11 @@ module.exports = program => {
     .command('login [email]')
     .description('logs a new user in')
     .action(async (defEmail) => {
-      const { email } = await login(false, defEmail)
+      const { email, error: loginError } = await login(false, defEmail)
+
+      if (loginError) {
+        error(loginError)
+      }
 
       if (!email) {
         return

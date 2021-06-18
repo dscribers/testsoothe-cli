@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer')
 const colors = require('colors')
-const spinner = require('./spinner')
+const spinner = require('ora')
+const { debugPort } = require('./env')
 const { error, success } = require('log-symbols')
 
 const terminal = {
@@ -25,36 +26,45 @@ const terminal = {
     stats (passes, fails) {
         console.log('')
         console.log(
-            colors.bgWhite.black.bold(` TOTAL: ${passes + fails} `),
-            colors.bgGreen.white.bold(` PASSES: ${passes} `),
-            colors.bgRed.white.bold(` FAILS: ${fails} `)
+            colors.bgGreen.white.bold(` passes: ${passes} `),
+            colors.bgRed.white.bold(` fails: ${fails} `)
         )
+        console.log('')
     }
 }
 
 module.exports = async (url, consoleTextPrefix = '[CLI] ') => {
-    const browser = await puppeteer.launch({
+    const browser = await puppeteer.launch.call(puppeteer, {
         args: [
             '--disable-dev-shm-usage',
             '--no-sandbox',
             '--disable-setuid-sandbox',
-            `--remote-debugging-port=${process.env.DEBUGGING_PORT || 9222}`,
+            `--remote-debugging-port=${debugPort()}`,
             '--remote-debugging-address=0.0.0.0',
         ]
     })
     const doneLogText = 'FINISHED'
+    const loader = spinner('Starting up')
 
     try {
         if (!url) {
             throw new Error('No url received')
         }
 
+        console.log(`Remote debugging: http://localhost:${debugPort()}`)
+        // console.log(`${url}&logPrefix=${encodeURIComponent(consoleTextPrefix)}&doneLogText=${encodeURIComponent(doneLogText)}`)
+        loader.start()
+
         const page = await browser.newPage()
-        const loader = spinner('')
         let passes = 0
         let fails = 0
 
-        loader.start()
+        page.on('error', error => {
+            terminal.info('on error')
+            terminal.error(error)
+
+            browser.close()
+        })
 
         page.on('console', msg => {
             const type = msg.type()
@@ -66,17 +76,19 @@ module.exports = async (url, consoleTextPrefix = '[CLI] ') => {
 
             text = text.replace(consoleTextPrefix, '').trim()
 
-            loader.stop()
-
             if (text === doneLogText) {
-                terminal.stats(passes, fails)
+                loader.clear()
+                loader.stop()
 
+                terminal.stats(passes, fails)
                 return browser.close()
             }
 
             if (!terminal[type]) {
                 return
             }
+
+            loader.clear()
 
             if (type === 'info') {
                 if (text.startsWith('SCENARIO:')) {
@@ -87,19 +99,22 @@ module.exports = async (url, consoleTextPrefix = '[CLI] ') => {
                     console.log('')
                 } else {
                     passes++
-                    terminal.lineSuccess(text)
+                    loader.succeed(text)
                 }
             } else {
                 fails++
-                terminal.lineFails(text)
+                loader.fail(text)
             }
 
-            loader.start()
+            loader.start('running')
         })
 
         await page.goto(`${url}&logPrefix=${encodeURIComponent(consoleTextPrefix)}&doneLogText=${encodeURIComponent(doneLogText)}`)
-    } catch (error) {
-        terminal.error(error)
-        await browser.close()
+    } catch ({ message }) {
+        loader.clear()
+        loader.stop()
+
+        terminal.error(message)
+        browser.close()
     }
 }

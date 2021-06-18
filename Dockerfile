@@ -15,7 +15,7 @@ RUN apk add --no-cache \
   nss \
   libc6-compat \
   udev
-RUN python3 \
+RUN apk add python3 \
   build-base \
   make \
   g++
@@ -28,12 +28,5 @@ WORKDIR /app
 RUN chown 1000:1000 /app
 
 USER 1000:1000
-
-COPY --chown=1000:1000 package.json ./
-COPY --chown=1000:1000 yarn.lock ./
-
-RUN yarn
-
-COPY --chown=1000:1000 . .
 
 ENV PATH /home/node/.yarn/bin:$PATH

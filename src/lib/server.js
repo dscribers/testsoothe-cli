@@ -64,7 +64,10 @@ const getToken = async email => {
         appName() + ' token was not found in the response'
       )
     }
-  } finally {
+  } catch (e) {
+    return { error: e.message }
+  }
+  finally {
     loader.stop()
   }
 }
