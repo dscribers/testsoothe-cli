@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer')
 const colors = require('colors')
 const spinner = require('ora')
-const { debugPort } = require('./env')
+const { apiUrl, debugPort, productionUrl } = require('./env')
 const { error, success } = require('log-symbols')
 
 const terminal = {
@@ -34,15 +34,19 @@ const terminal = {
 }
 
 module.exports = async (url, consoleTextPrefix = '[CLI] ') => {
-    const browser = await puppeteer.launch.call(puppeteer, {
-        args: [
-            '--disable-dev-shm-usage',
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            `--remote-debugging-port=${debugPort()}`,
-            '--remote-debugging-address=0.0.0.0',
-        ]
-    })
+    const debuggingPort = debugPort()
+    const args = [
+        '--disable-dev-shm-usage',
+        '--no-sandbox',
+        '--disable-setuid-sandbox'
+    ]
+
+    if (apiUrl !== productionUrl) {
+        args.push(`--remote-debugging-port=${debuggingPort}`)
+        args.push('--remote-debugging-address=0.0.0.0')
+    }
+
+    const browser = await puppeteer.launch.call(puppeteer, { args })
     const doneLogText = 'FINISHED'
     const loader = spinner('Starting up')
 
@@ -51,8 +55,10 @@ module.exports = async (url, consoleTextPrefix = '[CLI] ') => {
             throw new Error('No url received')
         }
 
-        console.log(`Remote debugging: http://localhost:${debugPort()}`)
-        // console.log(`${url}&logPrefix=${encodeURIComponent(consoleTextPrefix)}&doneLogText=${encodeURIComponent(doneLogText)}`)
+        if (apiUrl !== productionUrl) {
+            console.log(`Remote debugging: http://localhost:${debuggingPort}`)
+        }
+
         loader.start()
 
         const page = await browser.newPage()
