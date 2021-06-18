@@ -1,10 +1,11 @@
+.github
 .parcel-cache
-bin
 node_modules
 src
 .dockerignore
-.git
+.env.example
 .gitignore
+build
 docker-compose.yml
 Dockerfile
 yarn-error.log

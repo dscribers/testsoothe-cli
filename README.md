@@ -1,22 +1,14 @@
-# testsuite-cli
+# testsoothe-cli
 
 A command-line utility app for TestSoothe.
 
 ## Installation
 
 ```bash
-yarn global add @dscribe/testsuite-cli
+yarn global add @dscribe/testsoothe-cli
 ```
 
 ## Usage
 
-Run `testsuite` to see usage.
+Run `testsoothe` to see usage.
 
-## Development
-
-```bash
-docker-compose up --build -d
-docker-compose exec testsuite-cli sh
-```
-
-Then run commands `testsuite` commands.
