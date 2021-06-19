@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer')
 const colors = require('colors')
 const spinner = require('ora')
-const { apiUrl, debugPort, productionUrl } = require('./env')
+const { apiUrl, debugPort, productionApiUrl } = require('./env')
 const { error, success } = require('log-symbols')
 
 const terminal = {
@@ -41,7 +41,7 @@ module.exports = async (url, consoleTextPrefix = '[CLI] ') => {
         '--disable-setuid-sandbox'
     ]
 
-    if (apiUrl !== productionUrl) {
+    if (apiUrl !== productionApiUrl) {
         args.push(`--remote-debugging-port=${debuggingPort}`)
         args.push('--remote-debugging-address=0.0.0.0')
     }
@@ -55,7 +55,7 @@ module.exports = async (url, consoleTextPrefix = '[CLI] ') => {
             throw new Error('No url received')
         }
 
-        if (apiUrl !== productionUrl) {
+        if (apiUrl !== productionApiUrl) {
             console.log(`Remote debugging: http://localhost:${debuggingPort}`)
         }
 

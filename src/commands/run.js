@@ -6,13 +6,13 @@ const { error, success } = require('../lib/logger')
 
 module.exports = program => {
   program
-    .command('test')
-    .description('starts a test')
-    .option('-p, --project <project_id>', 'run test on a project')
-    .option('-f, --feature <feature_id>', 'run test on a feature')
-    .option('-s, --scenario <scenario_id>', 'run test on a scenario')
-    .option('-l, --flow <flow_id>', 'run test on a flow')
-    .option('-k, --runner-key <key>', 'runner key')
+    .command('run')
+    .description('runs the target')
+    .option('-p, --project <project_id>', 'sets a project as the target')
+    .option('-f, --feature <feature_id>', 'sets a feature as the target')
+    .option('-s, --scenario <scenario_id>', 'sets a scenario as the target')
+    .option('-l, --flow <flow_id>', 'sets a flow as the target')
+    .option('-k, --runner-key <key>', 'sets the runner key')
     .action(async ({ project, feature, scenario, flow, runnerKey }) => {
       runnerKey = runnerKey || config.get('auth.runner_key')
 

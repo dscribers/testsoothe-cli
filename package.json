@@ -9,7 +9,7 @@
   "main": "dist/index.js",
   "license": "MIT",
   "dependencies": {
-    "@ezraobiwale/http": "^1.3.0",
+    "@ezraobiwale/http": "^2.0.0",
     "clear": "^0.1.0",
     "colors": "^1.4.0",
     "commander": "^5.1.0",

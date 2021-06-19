@@ -2,7 +2,7 @@ const axios = require('axios')
 const config = require('./config')
 const { apiUrl } = require('./env')
 
-const Http = require('@ezraobiwale/http/dist/node-http')
+const Http = require('@ezraobiwale/http')
 
 module.exports = new Http({
   baseURL: apiUrl(),

@@ -11,9 +11,7 @@ import scenarios from '../commands/scenarios'
 import flows from '../commands/flows'
 import selections from '../commands/selections'
 import key from '../commands/key'
-import test from '../commands/test'
-
-require('dotenv').config()
+import run from '../commands/run'
 
 program.version(version)
 
@@ -25,6 +23,6 @@ scenarios(program)
 flows(program)
 selections(program)
 key(program)
-test(program)
+run(program)
 
 program.parse(process.argv)
