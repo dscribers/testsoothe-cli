@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+yarn install
+./build
+yarn publish --non-interactive --access public
+exit 0

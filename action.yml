@@ -1,0 +1,7 @@
+name: 'TestSoothe CLI'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  entrypoint: 'publish'
+  env:
+    NPM_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
