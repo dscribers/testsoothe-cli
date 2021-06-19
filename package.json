@@ -1,5 +1,5 @@
 {
-  "name": "@dscribe/testsoothe-cli",
+  "name": "@dscribers/testsoothe-cli",
   "description": "A command-line utility app for TestSoothe",
   "version": "1.0.0",
   "preferGlobal": true,
