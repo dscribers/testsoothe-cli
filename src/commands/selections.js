@@ -4,9 +4,20 @@ const { error, success } = require('../lib/logger')
 module.exports = program => {
   program
     .command('selections')
+    .option('-c, --clear', 'clears all selections')
     .description('show active selections')
-    .action(async () => {
-      const types = ['project', 'flow', 'feature', 'scenario'].filter((type) =>
+    .action(async ({ clear }) => {
+      const selections = ['project', 'flow', 'feature', 'scenario']
+
+      if (clear) {
+        selections.forEach(type => {
+          config.delete(`${type}s`)
+        })
+
+        return success(`Cleared all selections`)
+      }
+
+      const types = selections.filter((type) =>
         config.has(`${type}s.current`)
       )
 

@@ -39,9 +39,10 @@ module.exports = program => {
           .filter((type) => config.has(`${type}s.current`))
           .map((type) => {
             const label = config.get(`${type}s.label`)
+            const id = config.get(`${type}s.current`)
 
             return {
-              name: `${type} [${label}]`,
+              name: `${type} (${label} [${id}])`,
               short: type,
               value: type,
             }

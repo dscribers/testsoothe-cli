@@ -1,7 +1,14 @@
 {
   "name": "@dscribers/testsoothe-cli",
   "description": "A command-line utility app for TestSoothe",
-  "version": "1.0.0",
+  "keywords": [
+    "testsoothe",
+    "cli",
+    "dscribe",
+    "test",
+    "runner"
+  ],
+  "version": "1.2.0",
   "preferGlobal": true,
   "bin": {
     "testsoothe": "./dist/index.js"
@@ -16,11 +23,13 @@
     "configstore": "^5.0.1",
     "dotenv": "^8.2.0",
     "figlet": "^1.4.0",
+    "import": "^0.0.6",
     "inquirer": "^7.1.0",
     "lodash": "^4.17.15",
     "log-symbols": "^4.1.0",
     "ora": "^5.4.0",
-    "puppeteer": "^6.0.0"
+    "puppeteer": "^6.0.0",
+    "regenerator-runtime": "^0.13.7"
   },
   "devDependencies": {
     "@babel/core": "^7.14.3",

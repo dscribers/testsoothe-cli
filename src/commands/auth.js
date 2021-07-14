@@ -1,6 +1,6 @@
 const colors = require('colors')
-const { login, logout } = require('../lib/server')
-const { error, success } = require('../lib/logger')
+const { getCachedProfile, login, logout } = require('../lib/server')
+const { error, info, success } = require('../lib/logger')
 
 module.exports = program => {
   program
@@ -17,7 +17,20 @@ module.exports = program => {
         return
       }
 
-      success(`Logged in (${colors.italic(email)})`)
+      success(`Logged in as ${colors.italic(email)}`)
+    })
+
+  program
+    .command('whoami')
+    .description('Fetches the currently logged in user')
+    .action(async () => {
+      const { email } = await getCachedProfile()
+
+      if (!email) {
+        return info(`${colors.italic.bgRed.white('NOBODY')} Maybe log in now?`)
+      }
+
+      success(email)
     })
 
   program

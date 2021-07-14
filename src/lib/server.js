@@ -35,30 +35,38 @@ const getCredentials = email => {
     },
   ]
 
+  if ((email || '').trim()) {
+    questions.shift()
+  }
+
   return prompt(questions)
 }
 
 const getToken = async email => {
-  const { email: newEmail, password } = await getCredentials(email || config.get('auth.email'))
+  const { email: newEmail, password } = await getCredentials(email)
 
-  if (!newEmail || !password) {
+  if (newEmail) {
+    email = newEmail
+  }
+
+  if (!email || !password) {
     return {}
   }
 
-  const loader = spinner(`Logging ${newEmail} in`).start()
+  const loader = spinner(`Logging in with ${email}`).start()
 
   try {
-    const { data } = await http.post('/auth/login?cmd=1', { email: newEmail, password, source: 'cli' })
+    const { data } = await http.post('/auth/login?cmd=1', { email, password, source: 'cli' })
 
     if (data.token) {
-      config.set('auth.email', newEmail)
+      config.set('auth.email', email)
       config.set('auth.token', data.token)
 
       if (data.runner_key) {
         config.set('auth.runner_key', data.runner_key)
       }
 
-      return { email: newEmail, token: data.token }
+      return { email, token: data.token }
     } else {
       throw new Error(
         appName() + ' token was not found in the response'
@@ -72,7 +80,7 @@ const getToken = async email => {
   }
 }
 
-const isValidToken = async () => {
+const getCachedProfile = async () => {
   try {
     const auth = config.get('auth')
 
@@ -87,12 +95,9 @@ const isValidToken = async () => {
 }
 
 const login = async (force, email) => {
-  if (!email) {
-    const profile = await isValidToken()
-    email = profile.email
-  }
+  const profile = await getCachedProfile()
 
-  if (force || !email) {
+  if (force || !profile.email || (email && email !== profile.email)) {
     let authEmail = email
 
     if (force) {
@@ -101,7 +106,7 @@ const login = async (force, email) => {
 
     return await getToken(authEmail)
   } else {
-    return { email }
+    return { email: profile.email }
   }
 }
 
@@ -116,6 +121,7 @@ const logout = () => {
 }
 
 module.exports = {
+  getCachedProfile,
   http,
   login,
   logout,

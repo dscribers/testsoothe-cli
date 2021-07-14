@@ -6,7 +6,7 @@ services:
     build:
       context: .
     environment:
-      DEBUGGING_PORT: ${TEST_DEBUGGING_PORT}
+      TESTSOOTHE_DEBUGGING_PORT: ${TEST_DEBUGGING_PORT}
     volumes:
       - .:/app
     ports:

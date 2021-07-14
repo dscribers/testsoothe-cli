@@ -2,9 +2,11 @@
 FROM node:16.3-alpine
 
 RUN apk update && apk add --no-cache nmap
+
 RUN echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
   echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories && \
   apk update
+
 RUN apk add --no-cache \
   chromium \
   harfbuzz \
@@ -15,6 +17,7 @@ RUN apk add --no-cache \
   nss \
   libc6-compat \
   udev
+
 RUN apk add python3 \
   build-base \
   make \
