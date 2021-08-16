@@ -87,6 +87,11 @@ module.exports = async (url, consoleTextPrefix = '[CLI] ') => {
                 loader.stop()
 
                 terminal.stats(passes, fails)
+
+                if (fails) {
+                    process.exit(1)
+                }
+
                 return browser.close()
             }
 

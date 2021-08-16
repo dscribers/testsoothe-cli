@@ -6,7 +6,7 @@ const { error, info, success } = require('../lib/logger')
 module.exports = program => {
   program
     .command('key')
-    .description('shows the runner key or prompts to create one if not set')
+    .description('displays the runner key or prompts to create one if not set')
     .action(async () => {
       let key = config.get('auth.runner_key')
 

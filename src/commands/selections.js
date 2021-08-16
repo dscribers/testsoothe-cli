@@ -5,7 +5,7 @@ module.exports = program => {
   program
     .command('selections')
     .option('-c, --clear', 'clears all selections')
-    .description('show active selections')
+    .description('displays active selections')
     .action(async ({ clear }) => {
       const selections = ['project', 'flow', 'feature', 'scenario']
 

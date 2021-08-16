@@ -1,5 +1,5 @@
 const { http } = require('../lib/server')
-const { error, success } = require('../lib/logger')
+const { error, success, info } = require('../lib/logger')
 const spinner = require('ora')
 
 module.exports = program => {
