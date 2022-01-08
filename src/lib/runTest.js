@@ -88,9 +88,15 @@ module.exports = async (url, consoleTextPrefix = '[CLI] ') => {
                 loader.clear()
                 loader.stop()
 
-                terminal.stats(passes, fails)
+                if (passes || fails) {
+                    terminal.stats(passes, fails)
+                }
 
-                if (fails) {
+                if (fails || !passes) {
+                    if (!passes) {
+                        loader.fail('No action was taken')
+                    }
+
                     process.exit(1)
                 }
 

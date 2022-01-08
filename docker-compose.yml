@@ -15,14 +15,6 @@ services:
     volumes:
       - home-dir:/home/node/
       - .:/app
-    networks:
-      - testsoothe
 
 volumes:
   home-dir:
-
-networks:
-  testsoothe:
-     external:
-      name: testsoothe
-
