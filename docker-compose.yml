@@ -7,8 +7,6 @@ services:
       context: .
     environment:
       TESTSOOTHE_DEBUGGING_PORT: ${TEST_DEBUGGING_PORT}
-    volumes:
-      - .:/app
     ports:
       - ${TEST_DEBUGGING_PORT}:${TEST_DEBUGGING_PORT}
     user: 1000:1000

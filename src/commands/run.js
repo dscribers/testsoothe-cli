@@ -13,7 +13,8 @@ module.exports = program => {
     .option('-s, --scenario <scenario_id>', 'sets a scenario as the target')
     .option('-l, --flow <flow_id>', 'sets a flow as the target')
     .option('-k, --runner-key <key>', 'sets the runner key')
-    .action(async ({ project, feature, scenario, flow, runnerKey }) => {
+    .option('-u, --url <url>', 'sets the url to run the test against')
+    .action(async ({ project, feature, scenario, flow, runnerKey, url }) => {
       runnerKey = runnerKey || config.get('auth.runner_key')
 
       if (!runnerKey) {
@@ -65,10 +66,14 @@ module.exports = program => {
         id = config.get(`${type}s.current`)
       }
 
-      const url = `${domainUrl()}/view?action=runner&type=${type}&id=${id}&key=${runnerKey}&logs=1`
+      let testUrl = `${domainUrl()}/view?action=runner&type=${type}&id=${id}&key=${runnerKey}&logs=1`
+
+      if (url) {
+        testUrl += `&url=${url}`
+      }
 
       success(`${type} [${id}]`, 'Starting runner')
 
-      runTest(url)
+      runTest(testUrl)
     })
 }

@@ -4,7 +4,7 @@ const env = (key, defaultValue) => {
     return process.env[key] || defaultValue
 }
 
-const PRODUCTION_URL = 'https://app.testsoothe.com/#'
+const PRODUCTION_URL = 'https://app.testsoothe.com'
 const PRODUCTION_API_URL = 'https://api.testsoothe.com/api'
 
 module.exports = {

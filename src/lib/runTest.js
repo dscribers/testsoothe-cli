@@ -35,13 +35,15 @@ const terminal = {
 
 module.exports = async (url, consoleTextPrefix = '[CLI] ') => {
     const debuggingPort = debugPort()
+    const isProduction = apiUrl() === productionApiUrl
+
     const args = [
         '--disable-dev-shm-usage',
         '--no-sandbox',
         '--disable-setuid-sandbox'
     ]
 
-    if (apiUrl !== productionApiUrl) {
+    if (!isProduction) {
         args.push(`--remote-debugging-port=${debuggingPort}`)
         args.push('--remote-debugging-address=0.0.0.0')
     }
@@ -55,7 +57,7 @@ module.exports = async (url, consoleTextPrefix = '[CLI] ') => {
             throw new Error('No url received')
         }
 
-        if (apiUrl !== productionApiUrl) {
+        if (!isProduction) {
             console.log(`Remote debugging: http://localhost:${debuggingPort}`)
         }
 
