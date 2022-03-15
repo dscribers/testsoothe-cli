@@ -4,6 +4,46 @@ const prompt = require('../lib/prompt')
 const { domainUrl } = require('../lib/env')
 const { error, success } = require('../lib/logger')
 
+const createUrl = (type, id, runnerKey, customUrl) => {
+  const testUrl = `${domainUrl()}/view?action=runner&type=${type}&id=${id}&key=${runnerKey}&logs=1`
+
+  if (customUrl) {
+    return `${testUrl}&url=${customUrl}`
+  }
+
+  return testUrl
+}
+
+const getRunnerOptions = async () => {
+  const choices = ['project', 'flow', 'feature', 'scenario']
+    .filter((type) => config.has(`${type}s.current`))
+    .map((type) => {
+      const label = config.get(`${type}s.label`)
+      const id = config.get(`${type}s.current`)
+
+      return {
+        name: `${type} (${label} [${id}])`,
+        short: type,
+        value: type,
+      }
+    })
+
+  const { selectedType } = await prompt([
+    {
+      name: 'selectedType',
+      type: 'list',
+      message: 'What would you like to test?',
+      choices,
+    },
+  ])
+
+  if (!selectedType) {
+    return {}
+  }
+
+  return { id, type: selectedType }
+}
+
 module.exports = program => {
   program
     .command('run')
@@ -14,14 +54,26 @@ module.exports = program => {
     .option('-l, --flow <flow_id>', 'sets a flow as the target')
     .option('-k, --runner-key <key>', 'sets the runner key')
     .option('-u, --url <url>', 'sets the url to run the test against')
-    .action(async ({ project, feature, scenario, flow, runnerKey, url }) => {
-      runnerKey = runnerKey || config.get('auth.runner_key')
+    .option('-c, --config-file <config_file>', 'sets the path to the config file to use')
+    .action(async ({ configFile, project, feature, scenario, flow, runnerKey, url }) => {
+      const runnerConfig = {
+        parallel: true,
+        tests: []
+      }
+
+      if (configFile) {
+        const _config = require(require('path').resolve(configFile))
+
+        Object.assign(runnerConfig, _config)
+      }
+
+      runnerKey = runnerKey || runnerConfig.runnerKey || config.get('auth.runner_key')
 
       if (!runnerKey) {
         return error('Runner key not set')
       }
 
-      let id, type
+      let id, type, testUrls = []
 
       if (project) {
         type = 'project'
@@ -35,45 +87,34 @@ module.exports = program => {
       } else if (flow) {
         type = 'flow'
         id = flow
+      } else if ((runnerConfig.tests || []).length) {
+        runnerConfig.tests.forEach(({ id, type, customUrl }) => testUrls.push(createUrl(type, id, runnerKey, customUrl)))
       } else {
-        const choices = ['project', 'flow', 'feature', 'scenario']
-          .filter((type) => config.has(`${type}s.current`))
-          .map((type) => {
-            const label = config.get(`${type}s.label`)
-            const id = config.get(`${type}s.current`)
+        const options = getRunnerOptions()
 
-            return {
-              name: `${type} (${label} [${id}])`,
-              short: type,
-              value: type,
-            }
-          })
-
-        const { selectedType } = await prompt([
-          {
-            name: 'selectedType',
-            type: 'list',
-            message: 'What would you like to test?',
-            choices,
-          },
-        ])
-
-        if (!selectedType) {
+        if (!options.type) {
           return
         }
 
-        type = selectedType
+        type = options.type
         id = config.get(`${type}s.current`)
       }
 
-      let testUrl = `${domainUrl()}/view?action=runner&type=${type}&id=${id}&key=${runnerKey}&logs=1`
-
-      if (url) {
-        testUrl += `&url=${url}`
+      if (!testUrls.length) {
+        testUrls.push(createUrl(type, id, runnerKey, url))
+        success(`${type} [${id}]`, 'Starting runner')
       }
 
-      success(`${type} [${id}]`, 'Starting runner')
-
-      runTest(testUrl)
+      try {
+        if (testUrls.length > 1 && !runnerConfig.parallel) {
+          while (testUrls.length) {
+            await runTest([testUrls.shift()])
+          }
+        } else {
+          await runTest(testUrls)
+        }
+      } catch (e) {
+        error(e.message)
+      }
     })
 }

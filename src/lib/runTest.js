@@ -33,7 +33,7 @@ const terminal = {
     }
 }
 
-module.exports = async (url, consoleTextPrefix = '[CLI] ') => {
+module.exports = (urls, consoleTextPrefix = '[CLI] ') => new Promise(async resolve => {
     const debuggingPort = debugPort()
     const isProduction = apiUrl() === productionApiUrl
 
@@ -52,88 +52,128 @@ module.exports = async (url, consoleTextPrefix = '[CLI] ') => {
     const doneLogText = 'FINISHED'
     const loader = spinner('Starting up')
 
-    try {
-        if (!url) {
-            throw new Error('No url received')
-        }
+    const shouldLog = urls.length === 1
 
-        if (!isProduction) {
-            console.log(`Remote debugging: http://localhost:${debuggingPort}`)
-        }
+    if (!isProduction) {
+        console.log(`Remote debugging: http://localhost:${debuggingPort}`)
+    }
 
+    if (!shouldLog) {
         loader.start()
+    }
 
-        const page = await browser.newPage()
-        let passes = 0
-        let fails = 0
+    let done = urls.length
 
-        page.on('error', error => {
-            terminal.info('on error')
-            terminal.error(error)
+    const closeBrowser = () => {
+        done--
 
-            browser.close()
-        })
+        if (done) {
+            return
+        }
 
-        page.on('console', msg => {
-            const type = msg.type()
-            let text = msg.text()
-
-            if (!text.startsWith(consoleTextPrefix)) {
-                return
-            }
-
-            text = text.replace(consoleTextPrefix, '').trim()
-
-            if (text === doneLogText) {
-                loader.clear()
-                loader.stop()
-
-                if (passes || fails) {
-                    terminal.stats(passes, fails)
-                }
-
-                if (fails || !passes) {
-                    if (!passes) {
-                        loader.fail('No action was taken')
-                    }
-
-                    process.exit(1)
-                }
-
-                return browser.close()
-            }
-
-            if (!terminal[type]) {
-                return
-            }
-
-            loader.clear()
-
-            if (type === 'info') {
-                if (text.startsWith('SCENARIO:')) {
-                    console.log('')
-
-                    terminal.scenarioStarts(text.replace('SCENARIO: ', ''))
-
-                    console.log('')
-                } else {
-                    passes++
-                    loader.succeed(text)
-                }
-            } else {
-                fails++
-                loader.fail(text)
-            }
-
-            loader.start('running')
-        })
-
-        await page.goto(`${url}&logPrefix=${encodeURIComponent(consoleTextPrefix)}&doneLogText=${encodeURIComponent(doneLogText)}`)
-    } catch ({ message }) {
         loader.clear()
         loader.stop()
 
-        terminal.error(message)
         browser.close()
+
+        resolve()
     }
-}
+
+    urls.forEach(async url => {
+        try {
+            loader.start()
+
+            const page = await browser.newPage()
+            let passes = 0
+            let fails = 0
+
+            page.on('error', error => {
+                if (shouldLog) {
+                    terminal.info('on error')
+                    terminal.error(error)
+                }
+
+                closeBrowser()
+            })
+
+            page.on('console', msg => {
+                const type = msg.type()
+                let text = msg.text()
+
+                if (!text.startsWith(consoleTextPrefix)) {
+                    return
+                }
+
+                text = text.replace(consoleTextPrefix, '').trim()
+
+                if (text === doneLogText) {
+                    if (shouldLog) {
+                        loader.clear()
+                        loader.stop()
+
+                        if (passes || fails) {
+                            terminal.stats(passes, fails)
+                        }
+                    }
+
+                    if (fails || !passes) {
+                        if (shouldLog && !passes) {
+                            loader.fail('No action was taken')
+                        }
+
+                        process.exit(1)
+                    }
+
+                    return closeBrowser()
+                }
+
+                if (!terminal[type]) {
+                    return
+                }
+
+                if (shouldLog) {
+                    loader.clear()
+                }
+
+                if (type === 'info') {
+                    if (text.startsWith('SCENARIO:')) {
+                        if (shouldLog) {
+                            console.log('')
+
+                            terminal.scenarioStarts(text.replace('SCENARIO: ', ''))
+
+                            console.log('')
+                        }
+                    } else {
+                        passes++
+
+                        if (shouldLog) {
+                            loader.succeed(text)
+                        }
+                    }
+                } else {
+                    fails++
+
+                    if (shouldLog) {
+                        loader.fail(text)
+                    }
+                }
+
+                if (shouldLog) {
+                    loader.start('running')
+                }
+            })
+
+            await page.goto(`${url}&logPrefix=${encodeURIComponent(consoleTextPrefix)}&doneLogText=${encodeURIComponent(doneLogText)}`)
+        } catch ({ message }) {
+            if (shouldLog) {
+                loader.clear()
+                loader.stop()
+
+                terminal.error(message)
+            }
+
+            closeBrowser()
+        }
+    })
+})
