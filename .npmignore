@@ -1,5 +1,6 @@
 .github
 .parcel-cache
+bak
 node_modules
 src
 .dockerignore

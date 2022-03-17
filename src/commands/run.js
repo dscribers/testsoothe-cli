@@ -2,7 +2,8 @@ const config = require('../lib/config')
 const runTest = require('../lib/runTest')
 const prompt = require('../lib/prompt')
 const { domainUrl } = require('../lib/env')
-const { error, success } = require('../lib/logger')
+const { error, info, success } = require('../lib/logger')
+const { cosmiconfigSync } = require('cosmiconfig')
 
 const createUrl = (type, id, runnerKey, customUrl) => {
   const testUrl = `${domainUrl()}/view?action=runner&type=${type}&id=${id}&key=${runnerKey}&logs=1`
@@ -61,10 +62,25 @@ module.exports = program => {
         tests: []
       }
 
-      if (configFile) {
-        const _config = require(require('path').resolve(configFile))
+      const explorerSync = cosmiconfigSync('testsoothe')
+      let result = null
 
-        Object.assign(runnerConfig, _config)
+      if (configFile) {
+        info(`Loading config file at ${configFile}`)
+
+        result = explorerSync.load(configFile)
+      } else {
+        info(`Searching for config file`)
+
+        result = explorerSync.search()
+
+        if (result) {
+          info(`Found config at ${result.filepath}`)
+        }
+      }
+
+      if (result && !result.isEmpty) {
+        Object.assign(runnerConfig, result.config)
       }
 
       runnerKey = runnerKey || runnerConfig.runnerKey || config.get('auth.runner_key')
